@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { LayoutComponent } from './components/layout/layout.component';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -8,5 +9,6 @@ import { LayoutComponent } from './components/layout/layout.component';
   styleUrl: './app.css'
 })
 export class App {
+  private themeService = inject(ThemeService);
   protected readonly title = signal('gestao-investimento-ui');
 }

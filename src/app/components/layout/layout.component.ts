@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-layout',
@@ -12,10 +13,12 @@ import { Subscription } from 'rxjs';
 })
 export class LayoutComponent implements OnInit, OnDestroy {
   private router = inject(Router);
+  private themeService = inject(ThemeService);
   private routerSubscription?: Subscription;
   private resizeHandler = this.handleResize.bind(this);
   
   isSidebarOpen = signal(this.getInitialSidebarState());
+  currentTheme = this.themeService.theme;
 
   ngOnInit(): void {
     // Close sidebar on route change on mobile screens
@@ -49,6 +52,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
     if (window.innerWidth < 768) {
       this.closeSidebar();
     }
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
 
   private getInitialSidebarState(): boolean {
