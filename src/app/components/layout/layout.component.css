@@ -7,8 +7,15 @@
   min-height: 100vh;
 }
 
-@media (min-width: 1024px) {
-  .drawer-open .drawer-side {
-    transform: translateX(0);
-  }
+/* Ensure sidebar can be toggled on all screen sizes */
+.drawer-side {
+  z-index: 999;
+}
+
+.drawer-toggle:checked ~ .drawer-side {
+  transform: translateX(0);
+}
+
+.drawer-overlay {
+  background-color: rgba(0, 0, 0, 0.4);
 }
