@@ -1,0 +1,178 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Nome do Ativo -->
+    <div class="form-control w-full">
+      <label class="label">
+        <span class="label-text">Nome do Ativo *</span>
+      </label>
+      <input 
+        type="text" 
+        formControlName="name"
+        placeholder="Ex: Magazine Luiza"
+        class="input input-bordered w-full"
+        [class.input-error]="getFieldError('name')"
+      />
+      @if (getFieldError('name')) {
+        <label class="label">
+          <span class="label-text-alt text-error">{{ getFieldError('name') }}</span>
+        </label>
+      }
+    </div>
+
+    <!-- Código (Ticker) -->
+    <div class="form-control w-full">
+      <label class="label">
+        <span class="label-text">Código (Ticker) *</span>
+      </label>
+      <input 
+        type="text" 
+        formControlName="ticker"
+        placeholder="Ex: MGLU3"
+        class="input input-bordered w-full uppercase"
+        [class.input-error]="getFieldError('ticker')"
+      />
+      @if (getFieldError('ticker')) {
+        <label class="label">
+          <span class="label-text-alt text-error">{{ getFieldError('ticker') }}</span>
+        </label>
+      }
+    </div>
+  </div>
+
+  <!-- Tipo de Ativo -->
+  <div class="form-control w-full">
+    <label class="label">
+      <span class="label-text">Tipo de Ativo *</span>
+    </label>
+    <select formControlName="assetType" class="select select-bordered w-full">
+      @for (assetType of assetTypes; track assetType) {
+        <option [value]="assetType">{{ getAssetTypeLabel(assetType) }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- Preço de Compra -->
+    <div class="form-control w-full">
+      <label class="label">
+        <span class="label-text">Preço de Compra (R$) *</span>
+      </label>
+      <input 
+        type="number" 
+        formControlName="purchasePrice"
+        step="0.01"
+        min="0"
+        placeholder="0.00"
+        class="input input-bordered w-full"
+        [class.input-error]="getFieldError('purchasePrice')"
+      />
+      @if (getFieldError('purchasePrice')) {
+        <label class="label">
+          <span class="label-text-alt text-error">{{ getFieldError('purchasePrice') }}</span>
+        </label>
+      }
+    </div>
+
+    <!-- Quantidade -->
+    <div class="form-control w-full">
+      <label class="label">
+        <span class="label-text">Quantidade *</span>
+      </label>
+      <input 
+        type="number" 
+        formControlName="quantity"
+        min="1"
+        placeholder="1"
+        class="input input-bordered w-full"
+        [class.input-error]="getFieldError('quantity')"
+      />
+      @if (getFieldError('quantity')) {
+        <label class="label">
+          <span class="label-text-alt text-error">{{ getFieldError('quantity') }}</span>
+        </label>
+      }
+    </div>
+
+    <!-- Preço Atual -->
+    <div class="form-control w-full">
+      <label class="label">
+        <span class="label-text">Preço Atual (R$)</span>
+      </label>
+      <input 
+        type="number" 
+        formControlName="currentPrice"
+        step="0.01"
+        min="0"
+        placeholder="0.00"
+        class="input input-bordered w-full"
+      />
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Data de Compra -->
+    <div class="form-control w-full">
+      <label class="label">
+        <span class="label-text">Data de Compra *</span>
+      </label>
+      <input 
+        type="date" 
+        formControlName="purchaseDate"
+        class="input input-bordered w-full"
+        [class.input-error]="getFieldError('purchaseDate')"
+      />
+      @if (getFieldError('purchaseDate')) {
+        <label class="label">
+          <span class="label-text-alt text-error">{{ getFieldError('purchaseDate') }}</span>
+        </label>
+      }
+    </div>
+
+    <!-- Setor -->
+    <div class="form-control w-full">
+      <label class="label">
+        <span class="label-text">Setor</span>
+      </label>
+      <input 
+        type="text" 
+        formControlName="sector"
+        placeholder="Ex: Varejo, Tecnologia, Saúde"
+        class="input input-bordered w-full"
+      />
+    </div>
+  </div>
+
+  <!-- Observações -->
+  <div class="form-control w-full">
+    <label class="label">
+      <span class="label-text">Observações</span>
+    </label>
+    <textarea 
+      formControlName="notes"
+      placeholder="Observações sobre o investimento..."
+      class="textarea textarea-bordered w-full h-24"
+    ></textarea>
+  </div>
+
+  <!-- Botões de Ação -->
+  <div class="flex flex-col sm:flex-row gap-4 justify-end">
+    <button 
+      type="button" 
+      (click)="onCancelClick()"
+      class="btn btn-outline"
+      [disabled]="isLoading()"
+    >
+      Cancelar
+    </button>
+    <button 
+      type="submit" 
+      class="btn btn-primary"
+      [disabled]="form.invalid || isLoading()"
+    >
+      @if (isLoading()) {
+        <span class="loading loading-spinner loading-sm"></span>
+      }
+      {{ investment() ? 'Atualizar' : 'Adicionar' }} Investimento
+    </button>
+  </div>
+</form>

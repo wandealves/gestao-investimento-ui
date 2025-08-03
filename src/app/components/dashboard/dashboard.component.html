@@ -1,0 +1,120 @@
+<div class="container mx-auto p-4 space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <h1 class="text-3xl font-bold">Dashboard</h1>
+      <p class="text-base-content/70">Visão geral dos seus investimentos</p>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="card-title text-sm opacity-70">Valor Investido</h3>
+        <p class="text-2xl font-bold">{{ formatCurrency(portfolioSummary().totalInvested) }}</p>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="card-title text-sm opacity-70">Valor Atual</h3>
+        <p class="text-2xl font-bold">{{ formatCurrency(portfolioSummary().currentValue) }}</p>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="card-title text-sm opacity-70">Ganho/Perda</h3>
+        <p class="text-2xl font-bold" [ngClass]="getPerformanceClass(portfolioSummary().unrealizedGainPercentage)">
+          {{ formatCurrency(portfolioSummary().unrealizedGain) }}
+        </p>
+        <p class="text-sm opacity-70" [ngClass]="getPerformanceClass(portfolioSummary().unrealizedGainPercentage)">
+          {{ formatPercentage(portfolioSummary().unrealizedGainPercentage) }}
+        </p>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="card-title text-sm opacity-70">Dividend Yield</h3>
+        <p class="text-2xl font-bold text-success">{{ formatPercentage(portfolioSummary().dividendYield) }}</p>
+        <p class="text-sm opacity-70">{{ formatCurrency(portfolioSummary().monthlyDividends) }}/mês</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Asset Allocation and Performance -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Asset Allocation -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title">Alocação por Tipo de Ativo</h2>
+        <div class="space-y-3">
+          @for (allocation of portfolioSummary().assetAllocation; track allocation.assetType) {
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <div class="w-4 h-4 rounded-full bg-primary"></div>
+                <span class="font-medium">{{ getAssetTypeLabel(allocation.assetType) }}</span>
+                <span class="text-sm opacity-70">({{ allocation.count }})</span>
+              </div>
+              <div class="text-right">
+                <div class="font-semibold">{{ formatCurrency(allocation.value) }}</div>
+                <div class="text-sm opacity-70">{{ allocation.percentage.toFixed(1) }}%</div>
+              </div>
+            </div>
+            <progress class="progress progress-primary w-full" [value]="allocation.percentage" max="100"></progress>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Performers -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title">Melhores Performances</h2>
+        <div class="space-y-4">
+          @for (investment of topPerformers(); track investment.id) {
+            <div class="flex justify-between items-center">
+              <div>
+                <div class="font-medium">{{ investment.name }}</div>
+                <div class="text-sm opacity-70">{{ investment.ticker }}</div>
+              </div>
+              <div class="text-right">
+                <div class="font-semibold text-success">{{ formatPercentage(investment.gainLossPercentage) }}</div>
+                <div class="text-sm opacity-70">{{ formatCurrency(investment.gainLoss) }}</div>
+              </div>
+            </div>
+          }
+          @empty {
+            <p class="text-center opacity-70">Nenhum investimento encontrado</p>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title">Atividade Recente</h2>
+      <div class="space-y-3">
+        @for (dividend of portfolio().dividends.slice(-5); track dividend.id) {
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+              <div class="w-2 h-2 rounded-full bg-success"></div>
+              <div>
+                <div class="font-medium">Provento Recebido</div>
+                <div class="text-sm opacity-70">{{ dividend.receivedDate | date:'dd/MM/yyyy' }}</div>
+              </div>
+            </div>
+            <div class="text-success font-semibold">{{ formatCurrency(dividend.amount) }}</div>
+          </div>
+        }
+        @empty {
+          <p class="text-center opacity-70 py-8">Nenhuma atividade recente</p>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+.menu a.active {
+  background-color: hsl(var(--p));
+  color: hsl(var(--pc));
+}
+
+.drawer-content {
+  min-height: 100vh;
+}
+
+@media (min-width: 1024px) {
+  .drawer-open .drawer-side {
+    transform: translateX(0);
+  }
+}

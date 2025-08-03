@@ -1,0 +1,7 @@
+/* Investment list specific styles */
+.table th {
+  position: sticky;
+  top: 0;
+  background-color: hsl(var(--b1));
+  z-index: 10;
+}

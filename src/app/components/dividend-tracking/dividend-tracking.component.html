@@ -1,0 +1,250 @@
+<div class="container mx-auto p-4 space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <h1 class="text-3xl font-bold">Controle de Proventos</h1>
+      <p class="text-base-content/70">Acompanhe seus dividendos e rendimentos</p>
+    </div>
+    <button class="btn btn-primary" (click)="onShowForm()">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      Adicionar Provento
+    </button>
+  </div>
+
+  <!-- Year Filter and Summary -->
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Ano</span>
+      </label>
+      <select 
+        class="select select-bordered"
+        [value]="selectedYear()"
+        (change)="onYearChange($event)"
+      >
+        @for (year of getAvailableYears(); track year) {
+          <option [value]="year">{{ year }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="stats shadow col-span-3">
+      <div class="stat">
+        <div class="stat-title">Total no Ano</div>
+        <div class="stat-value text-success">{{ formatCurrency(yearlyTotal()) }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Média Mensal</div>
+        <div class="stat-value text-primary">{{ formatCurrency(averageMonthly()) }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Número de Proventos</div>
+        <div class="stat-value">{{ filteredDividends().length }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Dividend Form -->
+  @if (showForm()) {
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="card-title">Adicionar Provento</h2>
+          <button class="btn btn-sm btn-ghost" (click)="onHideForm()">✕</button>
+        </div>
+
+        <form [formGroup]="dividendForm" (ngSubmit)="onSubmit()" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Investment -->
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text">Investimento *</span>
+              </label>
+              <select 
+                formControlName="investmentId" 
+                class="select select-bordered w-full"
+                [class.select-error]="getFieldError('investmentId')"
+              >
+                <option value="">Selecione o investimento</option>
+                @for (investment of investments(); track investment.id) {
+                  <option [value]="investment.id">{{ investment.name }} ({{ investment.ticker }})</option>
+                }
+              </select>
+              @if (getFieldError('investmentId')) {
+                <label class="label">
+                  <span class="label-text-alt text-error">{{ getFieldError('investmentId') }}</span>
+                </label>
+              }
+            </div>
+
+            <!-- Dividend Type -->
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text">Tipo de Provento *</span>
+              </label>
+              <select 
+                formControlName="type" 
+                class="select select-bordered w-full"
+              >
+                @for (type of dividendTypes; track type) {
+                  <option [value]="type">{{ getDividendTypeLabel(type) }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Amount -->
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text">Valor (R$) *</span>
+              </label>
+              <input 
+                type="number" 
+                formControlName="amount"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                class="input input-bordered w-full"
+                [class.input-error]="getFieldError('amount')"
+              />
+              @if (getFieldError('amount')) {
+                <label class="label">
+                  <span class="label-text-alt text-error">{{ getFieldError('amount') }}</span>
+                </label>
+              }
+            </div>
+
+            <!-- Received Date -->
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text">Data de Recebimento *</span>
+              </label>
+              <input 
+                type="date" 
+                formControlName="receivedDate"
+                class="input input-bordered w-full"
+                [class.input-error]="getFieldError('receivedDate')"
+              />
+              @if (getFieldError('receivedDate')) {
+                <label class="label">
+                  <span class="label-text-alt text-error">{{ getFieldError('receivedDate') }}</span>
+                </label>
+              }
+            </div>
+
+            <!-- Ex-Dividend Date -->
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text">Data Ex-Dividendo</span>
+              </label>
+              <input 
+                type="date" 
+                formControlName="exDividendDate"
+                class="input input-bordered w-full"
+              />
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex justify-end gap-2">
+            <button type="button" class="btn btn-outline" (click)="onHideForm()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="dividendForm.invalid || isLoading()">
+              @if (isLoading()) {
+                <span class="loading loading-spinner loading-sm"></span>
+              }
+              Adicionar Provento
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Dividends by Type -->
+  @if (dividendsByType().length > 0) {
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title">Proventos por Tipo - {{ selectedYear() }}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          @for (item of dividendsByType(); track item.type) {
+            <div class="stat bg-base-200 rounded-lg">
+              <div class="stat-title">{{ getDividendTypeLabel(item.type) }}</div>
+              <div class="stat-value text-success text-lg">{{ formatCurrency(item.amount) }}</div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Dividends List -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-0">
+      <div class="overflow-x-auto">
+        <table class="table table-zebra">
+          <thead>
+            <tr>
+              <th>Investimento</th>
+              <th>Tipo</th>
+              <th>Valor</th>
+              <th>Data Recebimento</th>
+              <th>Data Ex-Dividendo</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (dividend of filteredDividends(); track dividend.id) {
+              <tr class="hover">
+                <td>
+                  @if (getInvestmentById(dividend.investmentId); as investment) {
+                    <div>
+                      <div class="font-semibold">{{ investment.name }}</div>
+                      <div class="text-sm opacity-70">{{ investment.ticker }}</div>
+                    </div>
+                  } @else {
+                    <span class="text-error">Investimento não encontrado</span>
+                  }
+                </td>
+                <td>
+                  <div class="badge badge-outline">{{ getDividendTypeLabel(dividend.type) }}</div>
+                </td>
+                <td class="font-semibold text-success">{{ formatCurrency(dividend.amount) }}</td>
+                <td>{{ formatDate(dividend.receivedDate) }}</td>
+                <td>
+                  @if (dividend.exDividendDate) {
+                    {{ formatDate(dividend.exDividendDate) }}
+                  } @else {
+                    <span class="text-base-content/50">—</span>
+                  }
+                </td>
+                <td>
+                  <button 
+                    class="btn btn-ghost btn-sm text-error" 
+                    (click)="onDelete(dividend)"
+                  >
+                    Excluir
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="text-center py-8">
+                  <div class="flex flex-col items-center gap-2">
+                    <div class="text-4xl opacity-30">💰</div>
+                    <p class="text-lg font-medium">Nenhum provento encontrado para {{ selectedYear() }}</p>
+                    <p class="text-sm opacity-70">Comece adicionando seus primeiros proventos</p>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
