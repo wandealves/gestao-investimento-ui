@@ -33,8 +33,22 @@ export class DashboardComponent {
   }
 
   getPerformanceClass(percentage: number): string {
-    if (percentage > 0) return 'text-success';
-    if (percentage < 0) return 'text-error';
-    return 'text-base-content';
+    if (percentage > 0) return 'text-green-600';
+    if (percentage < 0) return 'text-red-600';
+    return 'text-slate-800';
+  }
+
+  getColorForIndex(index: number): string {
+    const colors = [
+      '#3b82f6', // blue
+      '#10b981', // emerald
+      '#8b5cf6', // violet
+      '#f59e0b', // amber
+      '#ef4444', // red
+      '#06b6d4', // cyan
+      '#84cc16', // lime
+      '#f97316'  // orange
+    ];
+    return colors[index % colors.length];
   }
 }

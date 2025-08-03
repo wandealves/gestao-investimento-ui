@@ -1,94 +1,112 @@
-<div class="drawer">
-  <input id="drawer-toggle" type="checkbox" class="drawer-toggle" [checked]="isSidebarOpen()" />
-  
-  <!-- Page content -->
-  <div class="drawer-content flex flex-col">
-    <!-- Navbar -->
-    <div class="navbar bg-base-100 shadow-sm">
-      <div class="flex-none">
-        <label for="drawer-toggle" class="btn btn-square btn-ghost" (click)="toggleSidebar()">
-          @if (!isSidebarOpen()) {
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-            </svg>
-          } @else {
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          }
-        </label>
-      </div>
-      <div class="flex-1">
-        <h1 class="text-xl font-bold">Gestão de Investimentos</h1>
-      </div>
-      <div class="flex-none">
-        <!-- Theme toggle button -->
-        <button class="btn btn-ghost btn-circle">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Main content -->
-    <main class="flex-1 overflow-y-auto">
-      <router-outlet></router-outlet>
-    </main>
-  </div>
-
+<div class="flex h-screen bg-gradient-to-br from-slate-50 to-blue-50">
   <!-- Sidebar -->
-  <div class="drawer-side">
-    <label for="drawer-toggle" class="drawer-overlay" (click)="closeSidebar()"></label>
-    <aside class="min-h-full w-80 bg-base-200 text-base-content">
+  <aside 
+    class="bg-white shadow-xl border-r border-slate-200 text-slate-700 transition-all duration-300 ease-in-out overflow-hidden"
+    [class.w-80]="isSidebarOpen()"
+    [class.w-0]="!isSidebarOpen()"
+  >
+    <div class="h-full flex flex-col" style="width: 320px;">
       <!-- Sidebar header -->
-      <div class="p-4 border-b border-base-300">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg" style="background-color: hsl(var(--p)); color: hsl(var(--pc))">
-            💼
+      <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-2xl">
+            📈
           </div>
           <div>
-            <h2 class="text-lg font-bold">Gestão de Investimentos</h2>
-            <p class="text-sm opacity-70">Seu portfólio financeiro</p>
+            <h2 class="text-xl font-bold tracking-tight">InvestPro</h2>
+            <p class="text-blue-100 text-sm">Gestão Inteligente</p>
           </div>
         </div>
       </div>
 
       <!-- Navigation menu -->
-      <nav class="p-4">
-        <ul class="menu space-y-2">
+      <nav class="p-6 flex-1 overflow-y-auto">
+        <div class="space-y-1">
           @for (item of menuItems; track item.route) {
-            <li>
-              <a 
-                [routerLink]="item.route" 
-                routerLinkActive="active"
-                class="flex items-center gap-3 p-3 rounded-lg hover:bg-base-300 transition-colors"
-                (click)="onMenuItemClick()"
-              >
-                <span class="text-xl">{{ item.icon }}</span>
-                <span class="font-medium">{{ item.title }}</span>
-              </a>
-            </li>
+            <a 
+              [routerLink]="item.route" 
+              routerLinkActive="active"
+              class="nav-item flex items-center gap-4 p-4 rounded-xl transition-all duration-200 group"
+              (click)="onMenuItemClick()"
+            >
+              <span class="text-2xl group-hover:scale-110 transition-transform duration-200">{{ item.icon }}</span>
+              <span class="font-semibold whitespace-nowrap text-slate-700 group-hover:text-blue-600">{{ item.title }}</span>
+            </a>
           }
-        </ul>
+        </div>
       </nav>
 
       <!-- Sidebar footer -->
-      <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-base-300">
+      <div class="p-6 border-t border-slate-200 bg-slate-50">
         <div class="flex items-center justify-between">
-          <div class="text-sm opacity-70">
+          <div class="text-xs text-slate-500 font-medium">
             <p>Versão 1.0.0</p>
           </div>
           <div class="flex gap-2">
-            <!-- Theme toggle for desktop -->
-            <button class="btn btn-ghost btn-sm btn-circle hidden lg:flex">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Theme toggle -->
+            <button class="p-2 rounded-lg hover:bg-slate-200 transition-colors duration-200">
+              <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
               </svg>
             </button>
           </div>
         </div>
       </div>
-    </aside>
+    </div>
+  </aside>
+
+  <!-- Main content area -->
+  <div class="flex-1 flex flex-col">
+    <!-- Navbar -->
+    <div class="bg-white/80 backdrop-blur-sm border-b border-slate-200 px-6 py-4 shadow-sm">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <button 
+            class="p-2 rounded-lg hover:bg-slate-100 transition-colors duration-200" 
+            (click)="toggleSidebar()"
+          >
+            @if (!isSidebarOpen()) {
+              <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            } @else {
+              <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            }
+          </button>
+          <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Dashboard</h1>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <!-- Notifications -->
+          <button class="p-2 rounded-lg hover:bg-slate-100 transition-colors duration-200 relative">
+            <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-3-3V9a6 6 0 10-12 0v5l-3 3h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+          </button>
+          
+          <!-- Theme toggle -->
+          <button class="p-2 rounded-lg hover:bg-slate-100 transition-colors duration-200">
+            <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+            </svg>
+          </button>
+          
+          <!-- Profile -->
+          <div class="flex items-center gap-3 ml-2">
+            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+              U
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <main class="flex-1 overflow-y-auto p-6">
+      <router-outlet></router-outlet>
+    </main>
   </div>
 </div>
