@@ -4,6 +4,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } fro
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { ThemeService } from '../../services/theme.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -14,21 +15,31 @@ import { ThemeService } from '../../services/theme.service';
 export class LayoutComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private themeService = inject(ThemeService);
+  private authService = inject(AuthService);
   private routerSubscription?: Subscription;
   private resizeHandler = this.handleResize.bind(this);
   
   isSidebarOpen = signal(this.getInitialSidebarState());
   currentTheme = this.themeService.theme;
+  currentUser = this.authService.currentUser;
+  showUserMenu = signal(false);
+  isLoginPage = signal(false);
 
   ngOnInit(): void {
-    // Close sidebar on route change on mobile screens
+    // Close sidebar on route change on mobile screens and check for login page
     this.routerSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
+      .subscribe((event: NavigationEnd) => {
+        // Check if current route is login page
+        this.isLoginPage.set(event.url === '/login');
+        
         if (window.innerWidth < 768) {
           this.closeSidebar();
         }
       });
+
+    // Check initial route
+    this.isLoginPage.set(this.router.url === '/login');
 
     // Listen for window resize to adjust sidebar state
     window.addEventListener('resize', this.resizeHandler);
@@ -56,6 +67,15 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   toggleTheme(): void {
     this.themeService.toggleTheme();
+  }
+
+  toggleUserMenu(): void {
+    this.showUserMenu.set(!this.showUserMenu());
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.showUserMenu.set(false);
   }
 
   private getInitialSidebarState(): boolean {
