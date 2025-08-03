@@ -1,138 +1,171 @@
-<div class="container mx-auto p-4 space-y-6">
+<div class="space-y-8">
   <!-- Header -->
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <div>
-      <h1 class="text-3xl font-bold">Meus Investimentos</h1>
-      <p class="text-base-content/70">Gerencie seus ativos financeiros</p>
+      <h1 class="text-3xl font-bold text-slate-800 tracking-tight">Meus Investimentos</h1>
+      <p class="text-slate-600">Gerencie seus ativos financeiros</p>
+    </div>
+    <div class="flex gap-3">
+      <button 
+        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg flex items-center gap-2"
+        (click)="onAddInvestment()"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Incluir Investimento
+      </button>
     </div>
   </div>
 
   <!-- Filters and Search -->
-  <div class="card bg-base-100 shadow-sm">
-    <div class="card-body">
-      <div class="flex flex-col lg:flex-row gap-4">
-        <!-- Search -->
-        <div class="form-control flex-1">
+  <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-200">
+    <div class="flex flex-col lg:flex-row gap-4">
+      <!-- Search -->
+      <div class="flex-1">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
           <input 
             type="text" 
             placeholder="Buscar por nome, ticker ou setor..." 
-            class="input input-bordered w-full" 
+            class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200" 
             [ngModel]="searchTerm()"
             (ngModelChange)="searchTerm.set($event)"
           />
         </div>
+      </div>
 
-        <!-- Asset Type Filter -->
-        <div class="form-control min-w-48">
-          <select 
-            class="select select-bordered w-full"
-            [ngModel]="selectedAssetType()"
-            (ngModelChange)="selectedAssetType.set($event)"
-          >
-            <option value="ALL">Todos os Tipos</option>
-            @for (assetType of assetTypes; track assetType) {
-              <option [value]="assetType">{{ getAssetTypeLabel(assetType) }}</option>
-            }
-          </select>
-        </div>
+      <!-- Asset Type Filter -->
+      <div class="min-w-48">
+        <select 
+          class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 bg-white"
+          [ngModel]="selectedAssetType()"
+          (ngModelChange)="selectedAssetType.set($event)"
+        >
+          <option value="ALL">Todos os Tipos</option>
+          @for (assetType of assetTypes; track assetType) {
+            <option [value]="assetType">{{ getAssetTypeLabel(assetType) }}</option>
+          }
+        </select>
+      </div>
 
-        <!-- Sort -->
-        <div class="form-control min-w-48">
-          <select 
-            class="select select-bordered w-full"
-            [ngModel]="sortBy()"
-            (ngModelChange)="sortBy.set($event)"
-          >
-            <option value="name">Ordenar por Nome</option>
-            <option value="ticker">Ordenar por Ticker</option>
-            <option value="value">Ordenar por Valor</option>
-            <option value="performance">Ordenar por Performance</option>
-          </select>
-        </div>
+      <!-- Sort -->
+      <div class="min-w-48">
+        <select 
+          class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 bg-white"
+          [ngModel]="sortBy()"
+          (ngModelChange)="sortBy.set($event)"
+        >
+          <option value="name">Ordenar por Nome</option>
+          <option value="ticker">Ordenar por Ticker</option>
+          <option value="value">Ordenar por Valor</option>
+          <option value="performance">Ordenar por Performance</option>
+        </select>
       </div>
     </div>
   </div>
 
   <!-- Investments Table -->
-  <div class="card bg-base-100 shadow-xl">
-    <div class="card-body p-0">
-      <div class="overflow-x-auto">
-        <table class="table table-zebra">
-          <thead>
-            <tr>
-              <th (click)="onSort('name')" class="cursor-pointer hover:bg-base-200">
-                Nome {{ getSortIcon('name') }}
-              </th>
-              <th (click)="onSort('ticker')" class="cursor-pointer hover:bg-base-200">
-                Ticker {{ getSortIcon('ticker') }}
-              </th>
-              <th>Tipo</th>
-              <th>Quantidade</th>
-              <th>Preço Compra</th>
-              <th>Preço Atual</th>
-              <th (click)="onSort('value')" class="cursor-pointer hover:bg-base-200">
-                Valor Total {{ getSortIcon('value') }}
-              </th>
-              <th (click)="onSort('performance')" class="cursor-pointer hover:bg-base-200">
-                Performance {{ getSortIcon('performance') }}
-              </th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (investment of filteredAndSortedInvestments(); track investment.id) {
-              <tr class="hover">
-                <td>
+  <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-slate-50 border-b border-slate-200">
+          <tr>
+            <th (click)="onSort('name')" class="px-6 py-4 text-left text-sm font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors duration-200">
+              <div class="flex items-center gap-2">
+                Nome 
+                <span class="text-slate-400">{{ getSortIcon('name') }}</span>
+              </div>
+            </th>
+            <th (click)="onSort('ticker')" class="px-6 py-4 text-left text-sm font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors duration-200">
+              <div class="flex items-center gap-2">
+                Ticker 
+                <span class="text-slate-400">{{ getSortIcon('ticker') }}</span>
+              </div>
+            </th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">Tipo</th>
+            <th class="px-6 py-4 text-right text-sm font-semibold text-slate-700">Quantidade</th>
+            <th class="px-6 py-4 text-right text-sm font-semibold text-slate-700">Preço Compra</th>
+            <th class="px-6 py-4 text-right text-sm font-semibold text-slate-700">Preço Atual</th>
+            <th (click)="onSort('value')" class="px-6 py-4 text-right text-sm font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors duration-200">
+              <div class="flex items-center justify-end gap-2">
+                Valor Total 
+                <span class="text-slate-400">{{ getSortIcon('value') }}</span>
+              </div>
+            </th>
+            <th (click)="onSort('performance')" class="px-6 py-4 text-right text-sm font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors duration-200">
+              <div class="flex items-center justify-end gap-2">
+                Performance 
+                <span class="text-slate-400">{{ getSortIcon('performance') }}</span>
+              </div>
+            </th>
+            <th class="px-6 py-4 text-center text-sm font-semibold text-slate-700">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+          @for (investment of filteredAndSortedInvestments(); track investment.id) {
+            <tr class="hover:bg-slate-50 transition-colors duration-200">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-600 font-semibold text-sm">
+                    {{ investment.ticker.substring(0, 2) }}
+                  </div>
                   <div>
-                    <div class="font-semibold">{{ investment.name }}</div>
+                    <div class="font-semibold text-slate-800">{{ investment.name }}</div>
                     @if (investment.sector) {
-                      <div class="text-sm opacity-70">{{ investment.sector }}</div>
+                      <div class="text-sm text-slate-500">{{ investment.sector }}</div>
                     }
                   </div>
-                </td>
-                <td class="font-mono font-semibold">{{ investment.ticker }}</td>
-                <td>
-                  <div class="badge badge-outline">{{ getAssetTypeLabel(investment.assetType) }}</div>
-                </td>
-                <td>{{ investment.quantity }}</td>
-                <td>{{ formatCurrency(investment.purchasePrice) }}</td>
-                <td>
-                  @if (investment.currentPrice) {
-                    {{ formatCurrency(investment.currentPrice) }}
-                  } @else {
-                    <span class="text-base-content/50">—</span>
-                  }
-                </td>
-                <td class="font-semibold">
-                  {{ formatCurrency(getCurrentValue(investment)) }}
-                  <div class="text-sm opacity-70">
-                    Investido: {{ formatCurrency(getTotalInvested(investment)) }}
-                  </div>
-                </td>
-                <td>
-                  @if (investment.currentPrice) {
-                    <div [ngClass]="getPerformanceClass(getPerformance(investment))">
-                      <div class="font-semibold">{{ formatPercentage(getPerformance(investment)) }}</div>
-                      <div class="text-sm">{{ formatCurrency(getGainLoss(investment)) }}</div>
+                </div>
+              </td>
+              <td class="px-6 py-4 font-mono font-semibold text-slate-800">{{ investment.ticker }}</td>
+              <td class="px-6 py-4">
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                  {{ getAssetTypeLabel(investment.assetType) }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-right font-medium text-slate-800">{{ investment.quantity }}</td>
+              <td class="px-6 py-4 text-right font-medium text-slate-800">{{ formatCurrency(investment.purchasePrice) }}</td>
+              <td class="px-6 py-4 text-right font-medium text-slate-800">
+                @if (investment.currentPrice) {
+                  {{ formatCurrency(investment.currentPrice) }}
+                } @else {
+                  <span class="text-slate-400">—</span>
+                }
+              </td>
+              <td class="px-6 py-4 text-right">
+                <div class="font-bold text-slate-800">{{ formatCurrency(getCurrentValue(investment)) }}</div>
+                <div class="text-sm text-slate-500">
+                  Investido: {{ formatCurrency(getTotalInvested(investment)) }}
+                </div>
+              </td>
+              <td class="px-6 py-4 text-right">
+                @if (investment.currentPrice) {
+                  <div>
+                    <div class="font-bold" [ngClass]="getPerformanceClass(getPerformance(investment))">
+                      {{ formatPercentage(getPerformance(investment)) }}
                     </div>
-                  } @else {
-                    <span class="text-base-content/50">—</span>
-                  }
-                </td>
-                <td>
-                  <div class="dropdown dropdown-end">
-                    <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
-                      ⋮
+                    <div class="text-sm" [ngClass]="getPerformanceClass(getPerformance(investment))">
+                      {{ formatCurrency(getGainLoss(investment)) }}
                     </div>
-                    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-                      <li><a>Editar</a></li>
-                      <li><a>Ver Dividendos</a></li>
-                      <li><a (click)="onDelete(investment)" class="text-error">Excluir</a></li>
-                    </ul>
                   </div>
-                </td>
-              </tr>
-            } @empty {
+                } @else {
+                  <span class="text-slate-400">—</span>
+                }
+              </td>
+              <td class="px-6 py-4 text-center">
+                <div class="relative inline-block">
+                  <button class="p-2 rounded-lg hover:bg-slate-100 transition-colors duration-200">
+                    <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
               <tr>
                 <td colspan="9" class="text-center py-8">
                   <div class="flex flex-col items-center gap-2">
@@ -153,34 +186,89 @@
         </table>
       </div>
     </div>
-  </div>
 
   <!-- Summary Stats -->
   @if (filteredAndSortedInvestments().length > 0) {
-    <div class="stats stats-vertical lg:stats-horizontal shadow w-full">
-      <div class="stat">
-        <div class="stat-title">Total de Investimentos</div>
-        <div class="stat-value text-primary">{{ filteredAndSortedInvestments().length }}</div>
-      </div>
-      
-      <div class="stat">
-        <div class="stat-title">Valor Total Investido</div>
-        <div class="stat-value">
-          {{ formatCurrency(getTotalInvestedAmount()) }}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-200">
+        <div class="flex items-center justify-between mb-2">
+          <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+            </svg>
+          </div>
         </div>
+        <h3 class="text-sm font-medium text-slate-600 mb-1">Total de Investimentos</h3>
+        <p class="text-2xl font-bold text-blue-600">{{ filteredAndSortedInvestments().length }}</p>
       </div>
       
-      <div class="stat">
-        <div class="stat-title">Valor Atual</div>
-        <div class="stat-value">
-          {{ formatCurrency(getTotalCurrentValue()) }}
+      <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-200">
+        <div class="flex items-center justify-between mb-2">
+          <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            </svg>
+          </div>
         </div>
+        <h3 class="text-sm font-medium text-slate-600 mb-1">Valor Total Investido</h3>
+        <p class="text-2xl font-bold text-slate-800">{{ formatCurrency(getTotalInvestedAmount()) }}</p>
       </div>
       
-      <div class="stat">
-        <div class="stat-title">Ganho/Perda Total</div>
-        <div class="stat-value" [ngClass]="getPerformanceClass(getTotalGainLoss())">
+      <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-200">
+        <div class="flex items-center justify-between mb-2">
+          <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+          </div>
+        </div>
+        <h3 class="text-sm font-medium text-slate-600 mb-1">Valor Atual</h3>
+        <p class="text-2xl font-bold text-slate-800">{{ formatCurrency(getTotalCurrentValue()) }}</p>
+      </div>
+      
+      <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-200">
+        <div class="flex items-center justify-between mb-2">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center" 
+               [class.bg-green-100]="getTotalGainLoss() >= 0"
+               [class.bg-red-100]="getTotalGainLoss() < 0">
+            <svg class="w-5 h-5" 
+                 [class.text-green-600]="getTotalGainLoss() >= 0"
+                 [class.text-red-600]="getTotalGainLoss() < 0"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+        </div>
+        <h3 class="text-sm font-medium text-slate-600 mb-1">Ganho/Perda Total</h3>
+        <p class="text-2xl font-bold" [ngClass]="getPerformanceClass(getTotalGainLoss())">
           {{ formatCurrency(getTotalGainLoss()) }}
+        </p>
+      </div>
+    </div>
+  }
+
+  <!-- Investment Form Modal -->
+  @if (showForm()) {
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 rounded-t-2xl">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-slate-800">Novo Investimento</h2>
+            <button 
+              class="p-2 rounded-lg hover:bg-slate-100 transition-colors duration-200"
+              (click)="onFormCancel()"
+            >
+              <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="p-6">
+          <app-investment-form 
+            (onSave)="onFormSave()" 
+            (onCancel)="onFormCancel()">
+          </app-investment-form>
         </div>
       </div>
     </div>

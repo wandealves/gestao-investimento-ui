@@ -15,10 +15,6 @@ export const routes: Routes = [
     loadComponent: () => import('./components/investment-list/investment-list.component').then(m => m.InvestmentListComponent)
   },
   {
-    path: 'investments/new',
-    loadComponent: () => import('./components/investment-form/investment-form.component').then(m => m.InvestmentFormComponent)
-  },
-  {
     path: 'dividends',
     loadComponent: () => import('./components/dividend-tracking/dividend-tracking.component').then(m => m.DividendTrackingComponent)
   },

@@ -1,19 +1,22 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { InvestmentService } from '../../services/investment.service';
 import { PortfolioService } from '../../services/portfolio.service';
+import { InvestmentFormComponent } from '../investment-form/investment-form.component';
 import { Investment, AssetType } from '../../models/investment.model';
 
 @Component({
   selector: 'app-investment-list',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, InvestmentFormComponent],
   templateUrl: './investment-list.component.html',
   styleUrl: './investment-list.component.css'
 })
 export class InvestmentListComponent {
   private investmentService = inject(InvestmentService);
   private portfolioService = inject(PortfolioService);
+  private router = inject(Router);
 
   searchTerm = signal('');
   selectedAssetType = signal<AssetType | 'ALL'>('ALL');
@@ -99,9 +102,9 @@ export class InvestmentListComponent {
   }
 
   getPerformanceClass(percentage: number): string {
-    if (percentage > 0) return 'text-success';
-    if (percentage < 0) return 'text-error';
-    return 'text-base-content';
+    if (percentage > 0) return 'text-green-600';
+    if (percentage < 0) return 'text-red-600';
+    return 'text-slate-800';
   }
 
   getCurrentValue(investment: Investment): number {
@@ -138,5 +141,19 @@ export class InvestmentListComponent {
 
   getTotalGainLoss(): number {
     return this.filteredAndSortedInvestments().reduce((total, inv) => total + this.getGainLoss(inv), 0);
+  }
+
+  showForm = signal(false);
+
+  onAddInvestment(): void {
+    this.showForm.set(true);
+  }
+
+  onFormSave(): void {
+    this.showForm.set(false);
+  }
+
+  onFormCancel(): void {
+    this.showForm.set(false);
   }
 }

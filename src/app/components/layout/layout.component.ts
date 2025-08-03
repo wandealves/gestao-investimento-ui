@@ -84,11 +84,6 @@ export class LayoutComponent implements OnInit, OnDestroy {
       route: '/investments'
     },
     {
-      title: 'Adicionar Investimento',
-      icon: '➕',
-      route: '/investments/new'
-    },
-    {
       title: 'Proventos',
       icon: '💰',
       route: '/dividends'
