@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an Angular 20 investment management UI application with TailwindCSS and DaisyUI for styling. The project uses standalone components architecture and follows modern Angular patterns with signals.
+This is a complete Angular 20 investment management application called "InvestPro" with authentication, portfolio tracking, dividend management, and modern dark/light theme support. Built with standalone components, signals, and TailwindCSS with DaisyUI.
 
 ## Development Commands
 
@@ -18,36 +18,81 @@ This is an Angular 20 investment management UI application with TailwindCSS and 
 - No e2e testing framework is currently configured
 
 ### Code Generation
-- `ng generate component component-name` - Generate new component
+- `ng generate component component-name` - Generate new component (use standalone: true)
+- `ng generate service service-name` - Generate new service
 - `ng generate --help` - See all available schematics
 
-## Architecture
+## Application Architecture
 
-### Application Structure
-- **Standalone Components**: Uses Angular's standalone component architecture (no NgModules)
-- **Bootstrap**: Application bootstrapped via `bootstrapApplication()` in `src/main.ts`
-- **Configuration**: App config defined in `src/app/app.config.ts` with router and zone change detection
-- **Routing**: Empty routes array in `src/app/app.routes.ts` - ready for route definitions
-- **Main Component**: `App` component in `src/app/app.ts` uses signals for reactive state
+### Authentication System
+- **Mock Authentication**: Uses `AuthService` with predefined demo users
+- **Demo Credentials**: 
+  - Admin: `admin@investpro.com` / `admin123`  
+  - User: `user@investpro.com` / `user123`
+- **Route Guards**: `authGuard` protects authenticated routes, `loginGuard` prevents access to login when authenticated
+- **Persistent Sessions**: Uses localStorage for session management
+- **Conditional Layout**: Login page shows without sidebar/navbar, authenticated pages show full layout
 
-### Styling
-- **TailwindCSS**: Primary CSS framework imported in `src/styles.css`
-- **DaisyUI**: Component library plugin for TailwindCSS
-- **Build Integration**: Styles processed through Angular's build system
+### Data Models & Services
+- **Investment Model**: Core domain models in `src/app/models/investment.model.ts` with enums for `AssetType` and `DividendType`
+- **Auth Model**: Authentication types in `src/app/models/auth.model.ts` 
+- **Services Architecture**:
+  - `InvestmentService`: CRUD operations with localStorage persistence using signals
+  - `DividendService`: Dividend tracking and yield calculations
+  - `PortfolioService`: Aggregated portfolio analytics and performance metrics
+  - `AuthService`: Mock authentication with login/logout functionality
+  - `ThemeService`: Dark/light theme management with system preference detection
 
-### TypeScript Configuration
-- **Strict Mode**: Enabled with comprehensive strict checks
-- **Modern Target**: ES2022 with module preservation
-- **Angular Compiler**: Strict templates and injection parameters enabled
+### Component Structure
+- **Layout Component**: Conditional rendering based on route (login vs authenticated)
+- **Login Component**: Full-screen auth form with demo credential buttons
+- **Dashboard Component**: Portfolio overview with metrics cards and performance data
+- **Investment List Component**: CRUD interface with modal forms, filtering, and sorting
+- **Dividend Tracking Component**: Dividend management with yearly filtering and type categorization
+- **Investment Form Component**: Modal form for adding/editing investments
 
-### File Organization
-- `src/app/` - Main application code
-- `public/` - Static assets (favicon, etc.)
-- `src/styles.css` - Global styles with TailwindCSS imports
+### Routing & Navigation  
+- **Protected Routes**: All main routes (`/dashboard`, `/investments`, `/dividends`) require authentication
+- **Lazy Loading**: All components are lazy-loaded for performance
+- **Default Redirects**: Root redirects to dashboard, unknown routes redirect to login
 
-## Development Notes
+### Styling & Theming
+- **TailwindCSS v4**: Modern utility framework with custom dark mode overrides in `src/styles.css`
+- **DaisyUI**: Component library for consistent UI patterns
+- **Theme System**: Dynamic dark/light mode with class-based switching and localStorage persistence
+- **Custom CSS**: Dark mode overrides use `!important` to handle TailwindCSS v4 compatibility
+- **Responsive Design**: Mobile-first approach with collapsible sidebar
 
-- Uses Angular 20's latest features including signals and standalone components
-- Project configured with Prettier for HTML files with Angular parser
-- Build budgets set to 500kB warning / 1MB error for initial bundle
-- Component styles limited to 4kB warning / 8kB error
+### State Management
+- **Angular Signals**: Reactive state management throughout the application
+- **Computed Values**: Derived state for portfolio calculations and filtered data
+- **Local Storage**: Data persistence for investments, dividends, auth, and theme preferences
+- **Signal-based Services**: All services use signals for reactive data flow
+
+### Key Patterns
+- **Standalone Components**: No NgModules, everything uses standalone architecture
+- **Reactive Forms**: Form validation with `ReactiveFormsModule`
+- **Service Injection**: Modern `inject()` function usage
+- **Modal Patterns**: In-place modal forms instead of separate route navigation
+- **Defensive Coding**: Comprehensive error handling and type safety
+
+## Development Guidelines
+
+### Adding New Features
+- Use signals for reactive state management
+- Follow the existing service pattern with localStorage persistence  
+- Implement both light and dark theme styles
+- Add proper TypeScript interfaces in the models folder
+- Use standalone components with proper imports
+
+### Styling Conventions
+- Use TailwindCSS classes with dark: prefixes for theme support
+- Add custom CSS overrides in `src/styles.css` for complex dark mode scenarios
+- Maintain responsive design patterns (mobile-first)
+- Use gradient buttons and modern card designs to match existing UI
+
+### Data Persistence
+- All data is stored in localStorage with appropriate keys
+- Services handle serialization/deserialization automatically
+- Auth state persists across browser sessions
+- Theme preference persists and respects system settings initially
